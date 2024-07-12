@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delivery Management System</title>
+    <link rel="stylesheet" href="../login.css" />
+</head>
+<body>
+    <h2>Admin Registration</h2>
+    <div class="add-driver">
+        <form action="/admin/admin-register" method="POST" class="add-driver-form">
+            <label>Name: </label><input type="text" name="aname" required /><br>
+            <label>Phone: </label><input type="number" name="aphone" maxlength="10" minlength="10" required /><br>
+            <label>Email-Id: </label><input type="email" name="aemail" required /><br>
+            <% if (edit === 'exists') { %>
+                <p style="color: red;">User already exists</p>
+            <% } else if (edit === 'mismatch') { %>
+                <p style="color: red;">Password doesn't match</p>
+            <% } else if (edit === 'missing') { %>
+                <p style="color: red;">All fields are required</p>
+            <% } %>
+            <label>Company-Id: </label><input type="text" name="aCompanyid" required /><br>
+            <label>Create Password: </label><input type="password" name="apassword" required minlength="8" maxlength="10" /><br>
+            <label>Confirm Password: </label><input type="password" name="aconfirmpassword" required minlength="8" maxlength="10" /><br>
+            <button type="submit">Register</button>
+        </form>
+    </div>
+</body>
+</html>

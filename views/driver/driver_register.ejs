@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Driver Registration</title>
+  <link rel="stylesheet" href="./login.css"/>
+</head>
+
+<body>
+  <h2>Driver Registration</h2>
+  <div class="add-driver">
+    <form action="/driver/driver-register?edit=true" method="POST" class="add-driver-form">
+      <label>Name: </label><input type="text" name="name" /><br>
+      <label>Phone: </label><input type="number" name="phone" maxlength="10" minlength="10"/><br>
+      <label>Email-Id: </label><input type="text" name="email" /><br>
+      <% if(edit=='exists' ){%>
+        <p style="color: red;">User already exists</p><%}%>
+      <label>Company-Id: </label><input type="text" name="Companyid" /><br>
+      <label>Pincode: </label><input type="number" name="Pincode" minlength="6" maxlength="6"/><br>
+      <label>Create Password: </label><input type="password" name="password" required minlength="8"
+        maxlength="10" /><br>
+      <label>Confirm Password: </label><input type="password" name="confirmpassword" required minlength="8"
+        maxlength="10" />
+      <% if(edit=='mismatch' ){%>
+        <p style="color: red;">Password doesn't match</p><%}%>
+          <button type="submit">Register</button>
+    </form>
+  </div>
+</body>
+
+</html>

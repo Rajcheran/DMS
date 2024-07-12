@@ -1,0 +1,83 @@
+
+.container-fluid
+{
+    background-color: black;
+    height:100%;
+}
+
+.headclass
+{
+    display: flex;
+    flex-direction: row;
+    margin-top: 100px;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.display-content
+{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.blockone
+{
+    background-image: url(../home_images/parcel-carton-box-500x500.webp);
+    background-size:cover;
+    margin-left: 25px;
+    margin-top: 10px;
+    float:left;
+    width:30%;
+    height: 400px;
+    border:1px solid black;
+    border-radius: 25px;
+}
+
+.block:hover
+{
+    cursor: pointer;
+    opacity: 0.6;
+    
+}
+
+
+.blocktwo
+{  
+    background-image: url(../home_images/delivery-man-is-loading-boxes-into-van_1340-37411.avif);
+    background-size: cover;
+    float:left;
+    margin-left: 50px;
+    margin-right:50px;
+    margin-top: 10px;
+    width: 30%;
+    height: 400px;
+    border:1px solid black;
+    border-radius: 25px;
+    
+}
+
+
+
+
+.blockthree
+{
+    background-color:black;
+    float:left;
+    margin-right: 25px;
+    margin-top: 10px;
+    width:30%;
+    height:400px;
+    border:1px solid black;
+    border-radius: 25px;
+}
+
+.blockone > div
+{
+
+    border: 1px solid black;
+    color: rgb(0, 0, 0);
+    /* flex-basis: 500px; */
+}
+

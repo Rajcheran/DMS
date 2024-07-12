@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get User Location</title>
+    <script async src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCp8kyESLmkMmziZqqs2JlUJFbyDyPJmCk
+    API KEY&libraries=places"></script>
+</head>
+<body>
+    <button onclick="getLocation()">Get Maps</button>
+    <input type="hidden" id="dest" value="dasarahalli">
+    <div id="stops-container">
+        <!-- Stops will be dynamically populated here -->
+    </div>
+    <div id="map" style="height: 400px; width: 100%;"></div>
+    <p id="location"></p>
+
+    <script>
+        // Fetch stop addresses from backend
+        function fetchStops() {
+            // Replace with your backend endpoint
+            fetch('/driver/getmaps')
+                .then(response => response.json())
+                .then(data => {
+                    populateStops(data.stops);
+                })
+                .catch(error => console.error('Error fetching stops:', error));
+        }
+
+        function populateStops(stops) {
+            const stopsContainer = document.getElementById('stops-container');
+            stops.forEach((stop, index) => {
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.className = 'stop';
+                input.value = stop;
+                input.placeholder = `Stop ${index + 1} address or coordinates`;
+                stopsContainer.appendChild(input);
+            });
+        }
+
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            const latitude = position.coords.latitude;
+            const longitude = position.coords.longitude;
+            const destination = document.getElementById("dest").value.trim();
+            const stopInputs = document.querySelectorAll('.stop');
+
+            const allLocations = [
+                { name: "Current Location", lat: latitude, lng: longitude },
+                { name: destination, address: destination }
+            ];
+
+            stopInputs.forEach((input, index) => {
+                allLocations.push({ name: `Stop ${index + 1}`, address: input.value.trim() });
+            });
+
+            const geocodePromises = allLocations.slice(1).map(location => {
+                return new Promise((resolve, reject) => {
+                    geocodeAddress(location.address, coords => {
+                        if (coords) {
+                            location.lat = coords.lat;
+                            location.lng = coords.lng;
+                            resolve();
+                        } else {
+                            console.error(`Geocoding failed for address: ${location.address}`);
+                            reject(`Geocoding failed for address: ${location.address}`);
+                        }
+                    });
+                });
+            });
+
+            Promise.all(geocodePromises).then(() => {
+                const coordinatesArray = allLocations.map(location => ({
+                    name: location.name,
+                    lat: location.lat,
+                    lng: location.lng
+                }));
+
+                console.log("Coordinates Array:");
+                console.log(coordinatesArray);
+
+                const sequence = nearestNeighbor(coordinatesArray);
+
+                console.log("Visiting Sequence:");
+                console.log(sequence);
+
+                const nearestStops = sequence.slice(2, -1).map(name => {
+                    return allLocations.find(location => location.name === name).address;
+                });
+
+                const locationLink =` https://www.google.com/maps/dir/${latitude},${longitude}/${nearestStops.join('/')}/${destination}`;
+
+                const coordinatesInfo = coordinatesArray.map(location => `<p>${location.name}: (${location.lat}, ${location.lng})</p>`).join('') + 
+                    `<br><a style="text-decoration:none;color:black;border-style:solid;height:20px;width:60px;border-radius:2px;border-width:2px;border-color:black;" href="${locationLink}" target="_blank">View on Google Maps</a>`;
+
+                document.getElementById("location").innerHTML = coordinatesInfo;
+
+                plotPathOnMap(sequence.map(name => coordinatesArray.find(location => location.name === name)));
+            }).catch(error => {
+                console.error(error);
+                document.getElementById("location").innerHTML = "Geocoding failed for one or more addresses.";
+            });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("location").innerHTML = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("location").innerHTML = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("location").innerHTML = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("location").innerHTML = "An unknown error occurred.";
+                    break;
+            }
+        }
+
+        function geocodeAddress(address, callback) {
+            const geocoder = new google.maps.Geocoder();
+            geocoder.geocode({ 'address': address }, (results, status) => {
+                if (status === 'OK') {
+                    const coords = {
+                        lat: results[0].geometry.location.lat(),
+                        lng: results[0].geometry.location.lng()
+                    };
+                    callback(coords);
+                } else {
+                    console.log('Geocode was not successful for the following reason: ' + status);
+                    callback(null);
+                }
+            });
+        }
+
+        function getDistance(place1, place2) {
+            const lat1 = place1.lat;
+            const lng1 = place1.lng;
+            const lat2 = place2.lat;
+            const lng2 = place2.lng;
+            const R = 6371; // Radius of the Earth in km
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLng = (lng2 - lng1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c; // Distance in km
+            return distance;
+        }
+
+        function nearestNeighbor(places) {
+            const numPlaces = places.length; // Number of places to visit
+            const distances = Array.from({ length: numPlaces }, () => Array(numPlaces).fill(Infinity)); // Distance matrix
+
+            // Populate the distance matrix
+            for (let i = 0; i < numPlaces; i++) {
+                for (let j = i + 1; j < numPlaces; j++) {
+                    distances[i][j] = distances[j][i] = getDistance(places[i], places[j]);
+                }
+            }
+
+            let currentPlace = 0;
+            const visited = Array(numPlaces).fill(false); // Visited places tracker
+            visited[currentPlace] = true;
+
+            const visitingSequence = [places[currentPlace].name]; // Visiting sequence array
+
+            // Visit all places (except starting place)
+            for (let i = 1; i < numPlaces; i++) {
+                let minDistance = Infinity;
+                let nextPlace = -1;
+
+                // Find the nearest unvisited place
+                for (let j = 0; j < numPlaces; j++) {
+                    if (!visited[j] && distances[currentPlace][j] < minDistance) {
+                        minDistance = distances[currentPlace][j];
+                        nextPlace = j;
+                    }
+                }
+
+                // Mark the next place as visited and update current place
+                visited[nextPlace] = true;
+                currentPlace = nextPlace;
+
+                // Add next place to the sequence
+                visitingSequence.push(places[nextPlace].name);
+            }
+
+            return visitingSequence;
+        }
+
+        function plotPathOnMap(pathCoordinates) {
+            const mapOptions = {
+                zoom: 10,
+                center: pathCoordinates[0]
+            };
+
+            const map = new google.maps.Map(document.getElementById('map'), mapOptions);
+
+            const path = new google.maps.Polyline({
+                path: pathCoordinates.map(coord => ({lat: coord.lat, lng: coord.lng})),
+                geodesic: true,
+                strokeColor: '#FF0000',
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+
+            path.setMap(map);
+
+            // Place markers at each location
+            pathCoordinates.forEach((coords, index) => {
+                new google.maps.Marker({
+                    position: {lat: coords.lat, lng: coords.lng},
+                    map: map,
+                    title: `Stop ${index + 1}`
+                });
+            });
+        }
+
+        // Fetch stops on page load
+        window.onload = fetchStops;
+    </script>
+</body>
+</html>

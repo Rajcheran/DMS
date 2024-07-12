@@ -1,0 +1,103 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Get User Location</title>
+</head>
+<body>
+    <button onclick="getLocation()">Get Mpas</button>
+    <p id="location"></p>
+    <input type="text" id="desti" name="destination" value="<%= destination %>">
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            var destination = document.getElementById('desti').value;
+            var locationLink = `https://www.google.com/maps/dir/?api=1&origin=${latitude},${longitude}&destination=${destination}`;
+            document.getElementById("location").innerHTML = `
+                Latitude: ${latitude} <br/>
+                Longitude: ${longitude} <br/>
+                <a href="${locationLink}" target="_blank">View on Google Maps</a>
+            `;
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    document.getElementById("location").innerHTML = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    document.getElementById("location").innerHTML = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    document.getElementById("location").innerHTML = "The request to get user location timed out.";
+                    break;
+                case error.UNKNOWN_ERROR:
+                    document.getElementById("location").innerHTML = "An unknown error occurred.";
+                    break;
+            }
+        }
+    </script>
+</body>
+</html>
+
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <title>Get User Location</title>
+</head>
+
+<body>
+    <button onclick="getLocation()">Get Current Location</button>
+    <p id="location"></p>
+    <input type="text" id="desti" value="<%=destination%>">
+
+    <script>
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                document.getElementById("location").innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            const inp = document.getElementById('desti')
+            var destination = inp.value;
+            //var destination="kr market";
+            //var locationLink = https://www.google.com/maps/@${latitude},${longitude},15z;
+            var locationLink = 'https://www.google.com/maps/dir/?api=1&origin=' + latitude + ',' + longitude + '&destination='+destination;
+            document.getElementById("location").innerHTML = `Latitude: ${ latitude } <br/> Longitude: ${longitude} <br/> <a href="${locationLink}" target="_blank">View on Google Maps</a>`;
+        }
+
+                function showError(error) {
+            switch(error.code) {
+                case error.PERMISSION_DENIED:
+                document.getElementById("location").innerHTML = "User denied the request for Geolocation.";
+                break;
+                case error.POSITION_UNAVAILABLE:
+                document.getElementById("location").innerHTML = "Location information is unavailable.";
+                break;
+                case error.TIMEOUT:
+                document.getElementById("location").innerHTML = "The request to get user location timed out.";
+                break;
+                case error.UNKNOWN_ERROR:
+                document.getElementById("location").innerHTML = "An unknown error occurred.";
+                break;
+            }
+        }
+    </script>
+</body>
+
+</html> -->

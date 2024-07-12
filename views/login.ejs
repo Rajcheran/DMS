@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="icon" type="image/x-icon" href="">
+    <link rel="stylesheet" href="./login.css" />
+</head>
+
+<body>
+    <div class="flex-login-container">
+        <div class="admin-login weblogin toggle-class">
+            <form action="/admin/admin-main" method="post">
+            <h1 class="headingone" style="size: 100px; color:white; margin-left:20%">Admin Login</h1>
+            <input class="input-tags" type="text" name="email" placeholder="Email" value="<% if (editing) { %><%=email%><% } %>""
+                style="margin-top:300px; opacity: 0;" /><br>
+            <input class="input-tags" type="password" name="password" placeholder="password"
+                style="margin-top: 20px; opacity: 0;" /><br>
+            <button type="submit"
+                style="margin-top:30px; margin-left:34.5%; width: 11.5%; opacity: 0; height: 54px; border-radius: 35px;">Login</button>
+            </form>
+            <% if(editing){%>
+                <p style="color: red;">No User Found</p>
+                <%}%>
+            <div style="margin-top: 40px; margin-left:100px; display: inline;">
+                <a href="/admin/admin-register" style="color: white; font-weight: 500; text-decoration: none;">New User?</a>
+              </div>
+        </div>
+
+        <div class="driver-login weblogin">
+            <form action="/driver/driver-main" method="post">
+            <h1 class="headingtwo" style="size: 100px; color:black; margin-left:20%;"></h1>
+            <input class="input-tags-two" type="text" value="<% if (editing) { %><%=email%><% } %>" name="driver_email" style="margin-top:158px;" /><br>
+            <input class="input-tags-two" type="password" name="driver_password" style="margin-top:30px;" /><br>
+            <button type="submit"
+                style=" color: white; margin-top:25px; margin-left:36%; width: 27.6%; opacity: 0; height: 34px; border-radius: 20px;">Login</button>
+            </form>
+            <% if(editing){%>
+                <p style="color: red;">No User Found</p>
+                <%}%>
+            <div style="margin-top: 40px; margin-left:100px; display: inline;">
+                <form action="/driver/driver-register" method="get"></form>
+                <a href="/driver/driver-register" style="color: black; font-weight: 500; text-decoration: none; margin-left:25dvw;">New User?</a>
+            </form>
+              </div>
+        </div>
+    </div>
+
+    <script>
+    let images = [
+        "url('public/home_images/driverReg.jpg')",
+        "url('public/home_images/driverReg2.jpg')",
+        "url('public/home_images/driverReg3.jpg')",
+        "url('public/home_images/driverReg4.jpg')",
+      ];
+      
+      let imageIndex = 1;
+      
+      function changeBackground() {
+        var element = document.querySelector('.driver-start-image');
+        element.style.backgroundImage = images[imageIndex];
+        imageIndex = (imageIndex + 1) % images.length;
+      }
+      
+      setInterval(changeBackground, 5000); // Change background every 5 seconds (adjust the time as needed)
+      
+      // For login page background hovering effects
+      var elementOne = document.getElementsByClassName("input-tags-two")
+      var elementTwo = document.getElementsByClassName("input-tags")
+      
+      console.log(elementOne);
+      console.log(elementTwo);
+      
+      document.querySelector(".admin-login").addEventListener("mouseover", function() {
+      
+        document.querySelector(".headingtwo").innerHTML = "Driver Login"
+        document.querySelector(".headingone").innerHTML = ""
+      
+        for(let i = 0; i < elementOne.length; i++)
+        {
+          
+          elementOne[i].style.opacity = "0.0"
+          console.log(elementOne);
+        }
+        for(let i = 0; i < elementTwo.length; i++)
+        {
+          
+          elementTwo[i].style.opacity = "1"
+          console.log(elementTwo);
+        }
+        
+      
+      });
+      
+      document.querySelector(".admin-login").addEventListener("mouseout", function() {
+      
+        document.querySelector(".headingone").innerHTML = "Admin Login"
+        document.querySelector(".headingtwo").innerHTML = ""
+        for(let i = 0; i < elementOne.length; i++)
+        {
+          
+          elementOne[i].style.opacity = "1"
+          
+        }
+        for(let i = 0; i < elementTwo.length; i++)
+        {
+          
+          elementTwo[i].style.opacity = "0.0"
+          
+        }
+          
+      });</script>
+</body>
+
+</html>
