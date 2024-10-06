@@ -17,7 +17,7 @@ routes.post('/edit-product',drivercontroller.edit_order)
 
 routes.get('/logout',drivercontroller.logout)
 
-//routes.post('/driver-map',drivercontroller.get_indmap);
+routes.post('/driver-map',drivercontroller.get_indmap);
 routes.get('/driv-maps/:company_id/:pincode',drivercontroller.get_mpa);
 routes.get('/maps/:company_id/:pincode',drivercontroller.get_map_details);
 routes.get('/getmaps',drivercontroller.getmaps);

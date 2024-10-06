@@ -30,5 +30,5 @@ app.use('/admin',adminroutes)
 const errorcont = require('./controller/error')
 app.use(errorcont.get404)
 mongoconnect(()=>{
-    app.listen(300);
+    app.listen(6000);
 })
